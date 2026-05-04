@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { Analytics } from "@vercel/analytics/react";
 import type { GameMode, GameStatus, PlayerProfile, RunResult } from "./game/types";
 import type { TracebreakerEngine } from "./game/gameEngine";
 import { HomeScreen } from "./screens/HomeScreen";
@@ -180,16 +181,82 @@ export default function App() {
   }
 
   if (status === "gameOver" && result) {
-    return <GameOverScreen result={result} bestLevel={Math.max(profile.bestLevel, result.levelReached)} onRestart={restart} onHome={home} />;
+    return (
+      <>
+        <GameOverScreen result={result} bestLevel={Math.max(profile.bestLevel, result.levelReached)} onRestart={restart} onHome={home} />
+        <Analytics />
+      </>
+    );
   }
 
-  if (status === "victory" && result) return <VictoryScreen result={result} onRestart={restart} onHome={home} />;
-  if (status === "modeBriefing") return <ModeBriefingScreen mode={briefingMode} profile={profile} onStart={() => startGame(briefingMode)} onBack={home} />;
-  if (status === "upgrades") return <UpgradesScreen profile={profile} onUpdate={updateProfile} onBack={home} />;
-  if (status === "themes") return <ThemesScreen profile={profile} onUpdate={updateProfile} onBack={home} />;
-  if (status === "settings") return <SettingsScreen profile={profile} onUpdate={updateProfile} onBack={home} />;
-  if (status === "howToPlay") return <HowToPlayScreen onBack={home} />;
-  if (status === "ranks") return <RanksScreen profile={profile} onBack={home} />;
-  if (status === "credits") return <CreditsScreen profile={profile} onBack={home} />;
-  return <HomeScreen profile={profile} onStart={chooseMode} onNavigate={setStatus} />;
+  if (status === "victory" && result) {
+    return (
+      <>
+        <VictoryScreen result={result} onRestart={restart} onHome={home} />
+        <Analytics />
+      </>
+    );
+  }
+  if (status === "modeBriefing") {
+    return (
+      <>
+        <ModeBriefingScreen mode={briefingMode} profile={profile} onStart={() => startGame(briefingMode)} onBack={home} />
+        <Analytics />
+      </>
+    );
+  }
+  if (status === "upgrades") {
+    return (
+      <>
+        <UpgradesScreen profile={profile} onUpdate={updateProfile} onBack={home} />
+        <Analytics />
+      </>
+    );
+  }
+  if (status === "themes") {
+    return (
+      <>
+        <ThemesScreen profile={profile} onUpdate={updateProfile} onBack={home} />
+        <Analytics />
+      </>
+    );
+  }
+  if (status === "settings") {
+    return (
+      <>
+        <SettingsScreen profile={profile} onUpdate={updateProfile} onBack={home} />
+        <Analytics />
+      </>
+    );
+  }
+  if (status === "howToPlay") {
+    return (
+      <>
+        <HowToPlayScreen onBack={home} />
+        <Analytics />
+      </>
+    );
+  }
+  if (status === "ranks") {
+    return (
+      <>
+        <RanksScreen profile={profile} onBack={home} />
+        <Analytics />
+      </>
+    );
+  }
+  if (status === "credits") {
+    return (
+      <>
+        <CreditsScreen profile={profile} onBack={home} />
+        <Analytics />
+      </>
+    );
+  }
+  return (
+    <>
+      <HomeScreen profile={profile} onStart={chooseMode} onNavigate={setStatus} />
+      <Analytics />
+    </>
+  );
 }
