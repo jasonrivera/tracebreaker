@@ -121,9 +121,11 @@ function drawTarget(ctx: CanvasRenderingContext2D, x: number, y: number, w: numb
   ctx.strokeStyle = colors.grid;
   ctx.lineWidth = 2;
   ctx.stroke();
-  ctx.font = `${Math.max(11, w * 0.032)}px ui-monospace, SFMono-Regular, Menlo, monospace`;
+  const labelSize = Math.max(14, Math.min(25, w * 0.022));
+  const labelY = y + Math.max(22, Math.min(28, h * 0.18));
+  ctx.font = `800 ${labelSize}px ui-monospace, SFMono-Regular, Menlo, monospace`;
   ctx.fillStyle = colors.muted;
-  ctx.fillText("TARGET KEY", x + 16, y + 23);
+  ctx.fillText("TARGET KEY", x + 16, labelY);
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.font = `800 ${Math.min(88, Math.max(48, h * 0.78))}px ui-monospace, SFMono-Regular, Menlo, monospace`;
