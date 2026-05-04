@@ -7,18 +7,40 @@ let music: {
   intervalId: number;
   step: number;
 } | null = null;
+let audioUnlocked = false;
 
 function getContext(): AudioContext | null {
   const AudioContextCtor = window.AudioContext || window.webkitAudioContext;
   if (!AudioContextCtor) return null;
   context ??= new AudioContextCtor();
-  if (context.state === "suspended") void context.resume();
   return context;
+}
+
+export async function unlockAudio(settings: Settings): Promise<void> {
+  if (!settings.soundEnabled || audioUnlocked) return;
+  const ctx = getContext();
+  if (!ctx) return;
+  if (ctx.state === "suspended") {
+    await ctx.resume();
+  }
+
+  // iOS Safari is happiest when a tiny sound graph is started directly from
+  // the user's gesture before later scheduled music/SFX events.
+  const osc = ctx.createOscillator();
+  const amp = ctx.createGain();
+  osc.type = "sine";
+  osc.frequency.setValueAtTime(1, ctx.currentTime);
+  amp.gain.setValueAtTime(0.0001, ctx.currentTime);
+  osc.connect(amp).connect(ctx.destination);
+  osc.start(ctx.currentTime);
+  osc.stop(ctx.currentTime + 0.025);
+  audioUnlocked = true;
 }
 
 function tone(frequency: number, duration: number, type: OscillatorType, gain = 0.045, slideTo?: number): void {
   const ctx = getContext();
   if (!ctx) return;
+  if (ctx.state === "suspended") void ctx.resume();
   const osc = ctx.createOscillator();
   const amp = ctx.createGain();
   osc.type = type;
@@ -65,6 +87,10 @@ export function startBackgroundMusic(settings: Settings): void {
   if (!settings.soundEnabled || music) return;
   const ctx = getContext();
   if (!ctx) return;
+  if (!audioUnlocked || ctx.state === "suspended") {
+    void unlockAudio(settings).then(() => startBackgroundMusic(settings));
+    return;
+  }
   const master = ctx.createGain();
   const filter = ctx.createBiquadFilter();
   filter.type = "lowpass";

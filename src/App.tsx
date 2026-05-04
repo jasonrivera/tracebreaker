@@ -17,7 +17,7 @@ import { loadProfile, saveProfile } from "./storage/storage";
 import { applyTheme } from "./theme/designTokens";
 import { getTheme } from "./theme/themes";
 import { todayKey } from "./utils/dailyChallenge";
-import { startBackgroundMusic, syncBackgroundMusic } from "./utils/audio";
+import { startBackgroundMusic, syncBackgroundMusic, unlockAudio } from "./utils/audio";
 
 export default function App() {
   const [profile, setProfile] = useState<PlayerProfile>(() => loadProfile());
@@ -44,6 +44,22 @@ export default function App() {
 
   useEffect(() => {
     syncBackgroundMusic(profile.settings, status === "playing" || status === "paused");
+  }, [profile.settings, status]);
+
+  useEffect(() => {
+    const unlockFromGesture = () => {
+      void unlockAudio(profile.settings).then(() => {
+        if (status === "playing" || status === "paused") startBackgroundMusic(profile.settings);
+      });
+    };
+    window.addEventListener("pointerdown", unlockFromGesture, { capture: true, passive: true });
+    window.addEventListener("touchend", unlockFromGesture, { capture: true, passive: true });
+    window.addEventListener("keydown", unlockFromGesture, { capture: true });
+    return () => {
+      window.removeEventListener("pointerdown", unlockFromGesture, { capture: true });
+      window.removeEventListener("touchend", unlockFromGesture, { capture: true });
+      window.removeEventListener("keydown", unlockFromGesture, { capture: true });
+    };
   }, [profile.settings, status]);
 
   const updateProfile = useCallback((next: PlayerProfile) => setProfile(next), []);
@@ -80,7 +96,7 @@ export default function App() {
   );
 
   const startGame = (nextMode: GameMode) => {
-    startBackgroundMusic(profile.settings);
+    void unlockAudio(profile.settings).then(() => startBackgroundMusic(profile.settings));
     setMode(nextMode);
     setPaused(false);
     setResult(null);
