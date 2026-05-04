@@ -38,3 +38,7 @@ export function resetProfileSlice(profile: PlayerProfile, slice: "best" | "credi
   if (slice === "best") return { ...profile, bestLevel: 1, bestScore: 0, dailyChallengeScores: {} };
   return { ...profile, totalCredits: 0 };
 }
+
+export function createFreshProfile(): PlayerProfile {
+  return structuredClone(DEFAULT_PROFILE);
+}

@@ -2,11 +2,17 @@
   "name": "Tracebreaker",
   "short_name": "Tracebreaker",
   "description": "Break the trace before they find you.",
+  "id": "/",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
+  "display_override": ["standalone", "fullscreen"],
   "orientation": "portrait",
   "theme_color": "#06130f",
   "background_color": "#020604",
+  "categories": ["games", "entertainment"],
+  "lang": "en-US",
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "/icons/icon-192.svg",
